@@ -53,8 +53,8 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);overflow:hi
 #sub.on{opacity:1}#sub b{color:var(--amber);font-weight:800;margin-right:.5em}
 #zonetag{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-family:var(--cond);letter-spacing:.4em;font-size:13px;color:#b9c4c0;opacity:0;transition:opacity .6s}
 #zonetag.on{opacity:.9}
-.btn{position:absolute;pointer-events:auto;touch-action:none;border-radius:50%;border:1.5px solid #6b6c60;background:rgba(14,16,14,.7);color:var(--ink);font-family:var(--cond);font-weight:700;letter-spacing:.1em;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.15}
-.btn:active,.btn.dn{background:rgba(179,38,30,.55);border-color:var(--blood)}
+.btn{position:absolute;pointer-events:auto;touch-action:none;border-radius:50%;border:1.5px solid #6b6c60;background:rgba(14,16,14,.7);color:var(--ink);font-family:var(--cond);font-weight:700;letter-spacing:.1em;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.15;transition:transform .08s ease}
+.btn:active,.btn.dn{background:rgba(179,38,30,.55);border-color:var(--blood);transform:scale(0.92)}
 #b-fire{width:88px;height:88px;right:max(16px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));font-size:15px;border-color:var(--blood)}
 #b-hold{width:62px;height:62px;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 104px)}
 #b-zoom{width:62px;height:62px;right:calc(max(18px,env(safe-area-inset-right,0px)) + 74px);bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 104px)}
@@ -99,32 +99,39 @@ h1 em{font-style:normal;color:var(--blood)}
 /* iOS Safari viewport and tap handling */
 :root{padding:0}
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{overscroll-behavior:none;touch-action:manipulation}
-#app{height:100%;height:100dvh}
+html,body{position:fixed;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
+body{display:flex;flex-direction:column}
+#app{flex:1 1 auto;min-height:0;height:auto}
 #s-brief,#s-res{overflow-y:auto;touch-action:pan-y}
 .file{flex-shrink:0;margin:auto}
 .go,.card,#b-menu{touch-action:manipulation}
 
-/* Dedicated controls keep the aiming view clear. */
-body.playing #app{height:75dvh}
-#control-deck{position:fixed;inset:auto 0 0;height:25dvh;display:flex;align-items:center;gap:8px;pointer-events:auto;background:#11150f;border-color:var(--line);z-index:8;color:var(--ink)}
+/* Deck is a sibling of #app. iOS clips position:fixed inside #app's overflow:hidden. */
+body.playing #app{flex:1 1 auto;height:auto}
+#control-deck{position:relative;flex:0 0 25%;height:25%;width:100%;min-height:0;display:flex;align-items:center;gap:8px;pointer-events:auto;background:#11150f;border-color:var(--line);z-index:8;color:var(--ink)}
 body:not(.playing) #control-deck{display:none}
 #deck-status{flex:1;min-width:65px}
 #deck-status #h-cond,#deck-status #h-ammo{position:static;width:auto;margin:3px 0;padding:3px 5px}
 #deck-status #h-cond canvas{height:24px}
 #deck-status #h-ammo b{font-size:20px}
 #deck-status #h-ammo small{display:none}
-#deck-system{display:grid;gap:4px}
-#deck-system button,#deck-system #b-menu{position:static;min-height:36px;padding:5px 7px;color:var(--ink);background:#20251c;border:1px solid #6b6c60;font:11px var(--mono);touch-action:none}
+#deck-system{display:flex;flex-direction:column;justify-content:center;gap:4px;height:100%;min-height:0}
+#deck-system button,#deck-system #b-menu{position:static;min-width:48px;flex:1 1 0;min-height:44px;max-height:48px;height:auto;padding:5px 7px;color:var(--ink);background:#20251c;border:1px solid #6b6c60;font:11px var(--mono);touch-action:none;transition:transform .08s ease}
+#deck-system button:active,#deck-system #b-menu:active{transform:scale(0.92)}
 #deck-actions{display:flex;gap:6px;align-items:center}
 #deck-actions .btn{position:static;width:clamp(48px,14vw,80px);height:clamp(48px,14vw,80px);font-size:11px}
 #deck-actions #b-fire{border-color:var(--blood);background:#3b1714}
-#pause-screen{position:fixed;inset:0 0 25dvh;z-index:15;background:rgba(0,0,0,.8);display:grid;place-content:center;text-align:center;gap:20px}
+#pause-screen{position:absolute;inset:0;z-index:15;background:rgba(0,0,0,.8);display:grid;place-content:center;text-align:center;gap:20px}
 #pause-screen[hidden]{display:none}
 #pause-screen button{min-height:48px}
-@media(max-height:500px){#deck-system{grid-template-columns:repeat(3,1fr)}#deck-status #h-cond{display:none}#deck-actions .btn{width:52px;height:52px}}
+@media(max-height:500px){#deck-system{flex-direction:row;height:auto}#deck-status #h-cond{display:none}#deck-actions .btn{width:52px;height:52px}}
 </style>
 <div id="app">
+<div id="s-menu" class="scr on">
+ <h1>HELPFUL <em>SNIPER</em></h1>
+ <div class="sub1">おやくだちスナイパー ── 世の中の困り事を、狙撃で解決せよ</div>
+ <div id="list"></div>
+</div>
 <canvas id="gl"></canvas>
 <div id="flash"></div>
 <div id="dot" class="hide"></div>
@@ -148,11 +155,6 @@ body:not(.playing) #control-deck{display:none}
  <div id="h-rng">RNG --- m</div><div id="h-breath"><i></i></div>
  <div class="btn" id="b-zoom">ZOOM<br>×1</div><div class="btn" id="b-hold">息止め</div><div class="btn" id="b-fire">FIRE</div>
 </div>
-<div id="s-menu" class="scr on">
- <h1>HELPFUL <em>SNIPER</em></h1>
- <div class="sub1">おやくだちスナイパー ── 世の中の困り事を、狙撃で解決せよ</div>
- <div id="list"></div>
-</div>
 <div id="s-brief" class="scr"><div class="file" id="brief"></div></div>
 <div id="s-res" class="scr dim"><div class="res" id="res"></div></div>
 <div id="pause-screen" hidden><strong>一時停止</strong><button class="go" id="resume-btn">ゲームに戻る</button></div>
@@ -175,7 +177,9 @@ R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
 const cam=new T.PerspectiveCamera(58,1,.05,500);cam.rotation.order='YXZ';
 let scene=new T.Scene(),W={pick:[],lights:[],people:[],tick:null};
 function resize(){const w=Math.max(1,$('#app').clientWidth),h=Math.max(1,$('#app').clientHeight);R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
-addEventListener('resize',resize);
+function fitViewport(){const vv=window.visualViewport,h=Math.round(vv?vv.height:innerHeight);document.documentElement.style.height=h+'px';document.body.style.height=h+'px';resize()}
+addEventListener('resize',fitViewport);
+if(window.visualViewport){visualViewport.addEventListener('resize',fitViewport);visualViewport.addEventListener('scroll',fitViewport)}
 /* ---------- audio ---------- */
 let AC=null,MG=null,NB=null,amb=[];
 let muted=false,paused=false;try{muted=localStorage.getItem('tg.330.mute')==='1'}catch(e){}
@@ -598,9 +602,10 @@ cvs.addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p||G.mod
 ['pointerup','pointercancel','lostpointercapture'].forEach(n=>cvs.addEventListener(n,e=>ptr.delete(e.pointerId)));
 cvs.addEventListener('wheel',e=>{if(G.mode!=='play'||paused)return;e.preventDefault();cycleZoom(e.deltaY<0?1:-1)},{passive:false});
 const bf=$('#b-fire'),bh=$('#b-hold'),bz=$('#b-zoom');
-bf.addEventListener('pointerdown',e=>{e.preventDefault();fire()});bz.addEventListener('pointerdown',e=>{e.preventDefault();cycleZoom()});
+function tapFx(){try{if(navigator.vibrate)navigator.vibrate(15)}catch(e){}}
+bf.addEventListener('pointerdown',e=>{e.preventDefault();tapFx();fire()});bz.addEventListener('pointerdown',e=>{e.preventDefault();tapFx();cycleZoom()});
 const hold=v=>{if(G.mode!=='play'||paused||G.over)return;G.holding=v&&G.breath>.05;bh.classList.toggle('dn',G.holding)};
-bh.addEventListener('pointerdown',e=>{e.preventDefault();bh.setPointerCapture(e.pointerId);hold(true)});['pointerup','pointercancel','lostpointercapture'].forEach(n=>bh.addEventListener(n,()=>hold(false)));
+bh.addEventListener('pointerdown',e=>{e.preventDefault();tapFx();bh.setPointerCapture(e.pointerId);hold(true)});['pointerup','pointercancel','lostpointercapture'].forEach(n=>bh.addEventListener(n,()=>hold(false)));
 $('#b-menu').addEventListener('pointerdown',e=>{e.preventDefault();toMenu()});
 addEventListener('keydown',e=>{if(e.code==='Escape'&&!e.repeat){togglePause();return}if(paused)return;G.keys&&(G.keys[e.code]=true);if(e.code==='Space'){e.preventDefault();fire()}else if(e.code==='KeyZ')cycleZoom();else if(e.code==='ShiftLeft'||e.code==='ShiftRight')hold(true)});
 addEventListener('keyup',e=>{G.keys&&(G.keys[e.code]=false);if(e.code==='ShiftLeft'||e.code==='ShiftRight')hold(false)});
@@ -611,17 +616,17 @@ document.addEventListener('dblclick',e=>e.preventDefault());
 document.addEventListener('contextmenu',e=>e.preventDefault());
 const deck=document.createElement('section');deck.id='control-deck';deck.className='fc-control-deck';deck.setAttribute('aria-label','操作盤');
 deck.innerHTML='<div id="deck-status"></div><div id="deck-system"><button id="pause-btn" type="button">一時停止</button><button id="mute-btn" type="button"></button></div><div id="deck-actions"></div>';
-$('#hud').appendChild(deck);
+document.body.appendChild(deck);
 ['h-ammo','h-cond'].forEach(id=>$('#deck-status').appendChild($('#'+id)));
 $('#deck-system').appendChild($('#b-menu'));
 ['b-zoom','b-hold','b-fire'].forEach(id=>$('#deck-actions').appendChild($('#'+id)));
 function setPaused(value){paused=value;clearInput();$('#pause-screen').hidden=!paused;$('#pause-btn').textContent=paused?'再開':'一時停止';last=performance.now();if(AC){if(paused)AC.suspend();else audioInit()}}
 function togglePause(){if(G.mode==='play')setPaused(!paused)}
 function updateMute(){if(MG)MG.gain.value=muted?0:.75;$('#mute-btn').textContent=muted?'音 OFF':'音 ON';$('#mute-btn').setAttribute('aria-pressed',String(muted))}
-$('#pause-btn').addEventListener('pointerdown',e=>{e.preventDefault();togglePause()});$('#resume-btn').addEventListener('pointerdown',e=>{e.preventDefault();setPaused(false)});
-$('#mute-btn').addEventListener('pointerdown',e=>{e.preventDefault();muted=!muted;try{localStorage.setItem('tg.330.mute',muted?'1':'0')}catch(e){}updateMute()});
+$('#pause-btn').addEventListener('pointerdown',e=>{e.preventDefault();tapFx();togglePause()});$('#resume-btn').addEventListener('pointerdown',e=>{e.preventDefault();tapFx();setPaused(false)});
+$('#mute-btn').addEventListener('pointerdown',e=>{e.preventDefault();tapFx();muted=!muted;try{localStorage.setItem('tg.330.mute',muted?'1':'0')}catch(e){}updateMute()});
 updateMute();
-buildMenu();resize();requestAnimationFrame(loop);
+buildMenu();fitViewport();requestAnimationFrame(loop);
 
 </script>
 
